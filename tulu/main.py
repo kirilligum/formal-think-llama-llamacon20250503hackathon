@@ -11,18 +11,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorLis
 # HMM_MODEL_PATH = f'ctrlg/hmm_gpt2-large_common-gen_4096' # alternatively 'ctrlg/hmm_gpt2-large_common-gen_32768' for better quality
 BASE_MODEL_PATH = f'ctrlg/tulu2-7b_writing-prompts'
 HMM_MODEL_PATH = f'ctrlg/hmm_tulu2-7b_writing-prompts_32768'
-
 base_model = AutoModelForCausalLM.from_pretrained(BASE_MODEL_PATH).to(device)
 base_model.eval()
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_PATH)
 hmm_model = ctrlg.HMM.from_pretrained(HMM_MODEL_PATH).to(device)
-
-
-
-
-# problem_statement = "Instruction: Read the following question carefully. In the response, first write a step-by-step plan how to think about the question, indicate planning by 'Plan:', then after following the plan, give the final answer indicated by 'Final Answer:'. Question: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\nAnswer:"
-# problem_statement = "<|user|>\nInstruction: Read the following question carefully. In your response, first describe what type of a question this is starting with 'Question Type:', then write a step-by-step plan explaining step-by-step how to correctly answer the question start writing the plan by 'Plan:', then after following the plan, give the final answer indicated by 'Answer:'. Question: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\n<|assistant|>\nResponse:"
-problem_statement = "<|user|>\nInstruction: Read the following question carefully. In your response, first write a step-by-step plan 'Step {N}: ...' that explains your thinking, then after, give the final answer as 'Answer: ...'. Question: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\n<|assistant|>\nResponse:"
+problem_statement = "<|user|>\nQuestion: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\n<|assistant|>\nResponse:"
 prefix = problem_statement  # Start generation right after the prompt
 suffix = "<|endoftext|>"  # Must end with EOS token
 
@@ -30,33 +23,22 @@ prefix_ids = tokenizer.encode(prefix)
 suffix_ids = tokenizer.encode(suffix)
 # Prompt includes the prefix for the base model context
 prompt_ids = tokenizer.encode(f"<|endoftext|> {prefix}")
-# prefix_ids = tokenizer.encode(' on a fine sunny') # generate text starting with ' on a fine sunny'
-# suffix_ids = tokenizer.encode(' in the park.<|endoftext|>') # generate text ending with ' in the park.<|endoftext|>'
-# prompt_ids = tokenizer.encode('<|endoftext|> on a fine sunny') # prompt the base model with the '<|endoftext|>' token and the prefix
-
-min_new_tokens = 20
+min_new_tokens = 1
 max_new_tokens = 54
-# min_new_tokens = 5
-# max_new_tokens = 32
-
 vocab_size = hmm_model.vocab_size
 eos_token_id = hmm_model.eos_token_id
 ac_builder = ctrlg.AhoCorasickBuilder(vocab_size)
 word_count_builder = ctrlg.WordCountBuilder(tokenizer, vocab_size)
-
 dfa_graphs = []
-# constraint 1: one of [' girl', ' boy', ' girls', ' boys', ' children'] AND one of [' dogs', ' cats', ' dog', ' cat'] have to appear in the GIVEN ORDER.
-keyphrases = [['Step:'],
-              ['Final Answer:'],
-              [suffix]]
+# keyphrases = [['Step'],
+#               [suffix]]
+keyphrases = [[' ']]
 for keyphrase in keyphrases:
     patterns = [tokenizer.encode(x) for x in keyphrase]
     dfa_graphs.append(ac_builder.build(patterns))
 dfa_graphs = [ctrlg.DFA_concatenate(dfa_graphs)] # concatenate the patterns so they appear in the given order
-
-# constraint 2: generate 7 - 12 words
-a, b = 30, 44
-dfa_graphs.append(word_count_builder.build(a, b))
+# a, b = 30, 44
+# dfa_graphs.append(word_count_builder.build(a, b))
 
 dfa_graph = ctrlg.DFA_prod(dfa_graphs, mode='intersection') # logical and
 dfa_model = ctrlg.DFAModel(dfa_graph, vocab_size).to(device) # compile for GPU inference
