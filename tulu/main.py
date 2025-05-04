@@ -47,7 +47,8 @@ word_count_builder = ctrlg.WordCountBuilder(tokenizer, vocab_size)
 dfa_graphs = []
 # constraint 1: one of [' girl', ' boy', ' girls', ' boys', ' children'] AND one of [' dogs', ' cats', ' dog', ' cat'] have to appear in the GIVEN ORDER.
 keyphrases = [['Step:'],
-              ['Final Answer:']]
+              ['Final Answer:'],
+              [suffix]]
 for keyphrase in keyphrases:
     patterns = [tokenizer.encode(x) for x in keyphrase]
     dfa_graphs.append(ac_builder.build(patterns))
