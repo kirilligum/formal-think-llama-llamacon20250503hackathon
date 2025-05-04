@@ -15,8 +15,8 @@ SEQUENCE_LEN = 32
 import os
 
 
-CUDA_CORES = '0,1,2,3,4,5'
-BATCH_SIZE = 512
+CUDA_CORES = '0' # Set based on nvidia-smi output
+BATCH_SIZE = 32 # Reduced batch size further to prevent OOM
 
 
 # create data path
