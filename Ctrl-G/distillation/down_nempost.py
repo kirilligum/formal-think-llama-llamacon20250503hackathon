@@ -40,12 +40,15 @@ for split_name in splits:
         if row['input'] and isinstance(row['input'], list) and len(row['input']) > 0:
             input_dict = row['input'][0]
             if 'content' in input_dict:
-                content = input_dict['content']
+                original_content = input_dict['content']
+                # Normalize content (convert to lowercase)
+                normalized_content = original_content.lower()
                 # Check if content is not empty or just whitespace before detection
-                if content and not content.isspace():
-                    detected_language = detector.detect_language_of(content)
+                if normalized_content and not normalized_content.isspace():
+                    detected_language = detector.detect_language_of(normalized_content)
                     if detected_language == Language.ENGLISH:
-                        en_content_list.append(content)
+                        # Save the original, non-normalized content
+                        en_content_list.append(original_content)
                     else:
                         not_en_content_list.append(content)
                 else:
