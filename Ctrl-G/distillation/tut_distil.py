@@ -16,7 +16,7 @@ import os
 
 
 CUDA_CORES = '0' # Set based on nvidia-smi output
-BATCH_SIZE = 32 # Reduced batch size further to prevent OOM
+BATCH_SIZE = 128 # Setting batch size to 128
 
 
 # create data path
@@ -95,8 +95,8 @@ import os
 os.system('mkdir -p ./workspace/logs')
 LOG_FILE=f'./workspace/logs/{HMM_MODEL_ID}_log.txt'
 
-CUDA_CORES = '0,1,2,3,4,5'
-BATCH_SIZE = 256
+CUDA_CORES = '0' # Set based on nvidia-smi output
+BATCH_SIZE = 128 # Setting batch size to 128
 SAVE_PER_STEP = 10
 DROPOUT = 0.01
 
