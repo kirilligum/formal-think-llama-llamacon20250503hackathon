@@ -29,8 +29,8 @@ suffix_ids = tokenizer.encode(suffix)
 prompt_ids = tokenizer.encode(f"<|endoftext|> {prefix}")
 
 # Adjust token limits for reasoning steps
-min_new_tokens = 1000  # Minimum tokens for reasoning + answer
-max_new_tokens = 1100  # Maximum tokens for reasoning + answer
+min_new_tokens = 200  # Minimum tokens for reasoning + answer
+max_new_tokens = 240  # Maximum tokens for reasoning + answer
 
 vocab_size = hmm_model.vocab_size
 eos_token_id = hmm_model.eos_token_id
