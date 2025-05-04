@@ -16,7 +16,7 @@ SEQUENCE_LEN = 32
 import os
 
 
-CUDA_CORES = '0' # Set based on nvidia-smi output
+CUDA_CORES = '0,1,2,3,4,5,6,7' # Set based on nvidia-smi output (8 GPUs)
 BATCH_SIZE = 128 # Setting batch size to 128
 
 
@@ -25,7 +25,7 @@ os.system(f'mkdir -p {DATA_PATH}')
 
 
 # sample LVD_SIZE examples for initializing hmm parameters via latent variable distillation (LVD)
-cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=gpu \
+cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=8 \
     sample_data.py \
     --model_name_or_path {BASE_MODEL_PATH} \
     --tokenizer_name_or_path {BASE_MODEL_PATH} \
@@ -36,7 +36,7 @@ print(cmd)
 
 
 # sample TOTAL_CHUNKS chunks of training examples as the training set
-cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=gpu \
+cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=8 \
     sample_data.py \
     --model_name_or_path {BASE_MODEL_PATH} \
     --tokenizer_name_or_path {BASE_MODEL_PATH} \
@@ -47,7 +47,7 @@ print(cmd)
 
 
 # sample DEV_SIZE examples as the dev set
-cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=gpu \
+cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=8 \
     sample_data.py \
     --model_name_or_path {BASE_MODEL_PATH} \
     --tokenizer_name_or_path {BASE_MODEL_PATH} \
@@ -78,7 +78,7 @@ _ = os.system(f'mkdir -p {HMM_MODEL_PATH}')
 
 import os
 
-CUDA_CORES = '0,1,2,3,4,5'
+CUDA_CORES = '0,1,2,3,4,5,6,7' # Use all 8 GPUs for LVD
 SEQUENCES_FILE = f'{DATA_PATH}/{DATASET}.lvd'
 EMEBEDDINGS_FILE = f'{DATA_PATH}/{DATASET}.lvd.embeddings'
 
@@ -96,7 +96,7 @@ import os
 os.system('mkdir -p ./workspace/logs')
 LOG_FILE=f'./workspace/logs/{HMM_MODEL_ID}_log.txt'
 
-CUDA_CORES = '0' # Set based on nvidia-smi output
+CUDA_CORES = '0,1,2,3,4,5,6,7' # Set based on nvidia-smi output (8 GPUs)
 BATCH_SIZE = 128 # Setting batch size to 128
 SAVE_PER_STEP = 10
 DROPOUT = 0.01
@@ -110,7 +110,7 @@ DROPOUT = 0.01
 # 6. train for 1 EM steps, each step using 40 chunks of data
 EM_SCHEDULE = "\"10,1;5,2;4,5;4,10;4,20;1,40\""
 
-cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=gpu train_hmm.py \
+cmd = f'CUDA_VISIBLE_DEVICES={CUDA_CORES} torchrun --standalone --nproc_per_node=8 train_hmm.py \
     --model_path {HMM_MODEL_PATH} --checkpoint 0 --save_per_step {SAVE_PER_STEP} \
     --data_path {DATA_PATH} --dataset {DATASET} --total_chunks {TOTAL_CHUNKS} --batch_size {BATCH_SIZE} \
     --em_schedule {EM_SCHEDULE} --dropout {DROPOUT} --log_file {LOG_FILE}'.strip()
