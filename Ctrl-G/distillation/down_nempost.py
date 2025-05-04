@@ -22,20 +22,14 @@ for split_name in splits:
     if split_name == 'safety':
         continue
 
-    num_samples = 50
-    print(f"Loading {num_samples} samples from split: {split_name}")
+    print(f"Processing all samples from split: {split_name}")
     # Load the current split
+    # Consider using streaming=True for very large datasets if memory becomes an issue
+    # ds = load_dataset(dataset_name, split=split_name, streaming=True)
     ds = load_dataset(dataset_name, split=split_name)
 
-    # Get the first num_samples rows
-    # Ensure we don't request more samples than available in the split
-    actual_samples = min(num_samples, len(ds))
-    if actual_samples < num_samples:
-        print(f"  Warning: Split '{split_name}' only has {actual_samples} rows. Taking all of them.")
-    sample = ds.select(range(actual_samples))
-
-    # Collect the 'content' from the 'input' field for this split's sample
-    for row in sample:
+    # Collect the 'content' from the 'input' field for all rows in the split
+    for row in ds:
         # Assuming 'input' is a list containing one dictionary
         if row['input'] and isinstance(row['input'], list) and len(row['input']) > 0:
             input_dict = row['input'][0]
