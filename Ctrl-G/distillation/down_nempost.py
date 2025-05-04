@@ -1,8 +1,17 @@
 import json
-from datasets import load_dataset
+from datasets import load_dataset, get_dataset_split_names
 
 # Login using e.g. `huggingface-cli login` to access this dataset
-ds = load_dataset("nvidia/Llama-Nemotron-Post-Training-Dataset", split='chat')
+dataset_name = "nvidia/Llama-Nemotron-Post-Training-Dataset"
+
+# Get and print the available splits
+print(f"Available splits in {dataset_name}:")
+splits = get_dataset_split_names(dataset_name)
+print(splits)
+print("-" * 20) # Separator
+
+# Load the desired split
+ds = load_dataset(dataset_name, split='chat')
 
 # Get the first 2 rows
 sample = ds.select(range(2))
