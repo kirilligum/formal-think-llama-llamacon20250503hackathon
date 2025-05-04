@@ -6,6 +6,6 @@ ds = load_dataset("nvidia/Llama-Nemotron-Post-Training-Dataset", split='chat')
 # Get the first 2 rows
 sample = ds.select(range(2))
 
-# Print the sample
+# Print the 'input' field from the sample
 for row in sample:
-    print(row)
+    print(row['input'])
