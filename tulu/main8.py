@@ -27,21 +27,21 @@ suffix_ids = tokenizer.encode(suffix)
 # Prompt includes the prefix for the base model context
 prompt_ids = tokenizer.encode(f"<|endoftext|> {prefix}")
 min_new_tokens = 1
-max_new_tokens = 54
+max_new_tokens = 154
 vocab_size = hmm_model.vocab_size
 eos_token_id = hmm_model.eos_token_id
 ac_builder = ctrlg.AhoCorasickBuilder(vocab_size)
 word_count_builder = ctrlg.WordCountBuilder(tokenizer, vocab_size)
 dfa_graphs = []
-# keyphrases = [['Step'],
-#               [suffix]]
-keyphrases = [[' ']]
+keyphrases = [['Step'],
+              [suffix]]
+# keyphrases = [[' ']]
 for keyphrase in keyphrases:
     patterns = [tokenizer.encode(x) for x in keyphrase]
     dfa_graphs.append(ac_builder.build(patterns))
 dfa_graphs = [ctrlg.DFA_concatenate(dfa_graphs)] # concatenate the patterns so they appear in the given order
-# a, b = 30, 44
-# dfa_graphs.append(word_count_builder.build(a, b))
+a, b = 130, 144
+dfa_graphs.append(word_count_builder.build(a, b))
 
 dfa_graph = ctrlg.DFA_prod(dfa_graphs, mode='intersection') # logical and
 dfa_model = ctrlg.DFAModel(dfa_graph, vocab_size).to(device) # compile for GPU inference
