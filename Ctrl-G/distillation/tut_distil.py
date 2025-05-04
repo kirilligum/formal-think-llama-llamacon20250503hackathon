@@ -1,10 +1,10 @@
-BASE_MODEL_PATH = 'gpt2-large'
+BASE_MODEL_PATH = 'meta-llama/Llama-3.2-1B-Instruct'
 
 # a list of prompts used to sample data from the given LLM, 
 # please change according to the LLM & your use cases.
 INPUT_FILE = './workspace/inference_data/distillation_prompts.json' 
 
-DATASET = 'gpt2-large'
+DATASET = 'Llama-3.2-1B-Instruct' # Updated dataset name
 DATA_PATH = f'./workspace/hmm_data/{DATASET}'
 LVD_SIZE = 100000
 CHUNK_SIZE = 100000
