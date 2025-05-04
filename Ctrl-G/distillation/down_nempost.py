@@ -50,7 +50,8 @@ for split_name in splits:
                         # Save the original, non-normalized content
                         en_content_list.append(original_content)
                     else:
-                        not_en_content_list.append(content)
+                        # Save the original, non-normalized content
+                        not_en_content_list.append(original_content)
                 else:
                     # Handle empty or whitespace-only content if necessary, e.g., skip or add to a specific list
                     # print(f"Skipping empty content in split {split_name}")
