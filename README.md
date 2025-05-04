@@ -8,7 +8,7 @@
         - o3 84% much better than current 4.1 but based on gpt4(o) that came out two years ago
         - llm hallucinate. if you ask them to think for 1000 tokens, they don't. if you ask them for a specific way of thinking (graph of thought) they often don't
     - we use formal verification technique -- automata to adjust probability and obey our constraints
-        - [ Adaptable Logical Control for Large Language Models ] (https://arxiv.org/abs/2406.13892) 
+        - [Adaptable Logical Control for Large Language Models](https://arxiv.org/abs/2406.13892) 
           Honghua Zhang &Po-Nien Kung∗ &Masahiro Yoshida Guy Van den Broeck &Nanyun Peng
           https://github.com/joshuacnf/Ctrl-G 
         - ![](https://firebasestorage.googleapis.com/v0/b/firescript-577a2.appspot.com/o/imgs%2Fapp%2Fkirilligum-personal%2FFTLJxxBadX.png?alt=media&token=c6f75151-7a8b-4a61-a470-7d17637ec289)
