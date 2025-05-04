@@ -5,8 +5,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # set your cuda device
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import torch
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          LogitsProcessorList)
+from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
 
 import ctrlg
 
@@ -21,8 +20,8 @@ hmm_model = ctrlg.HMM.from_pretrained(HMM_MODEL_PATH).to(device)
 
 # --- Define Reasoning Task ---
 problem_statement = "Question: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\nAnswer:"
-prefix = problem_statement # Start generation right after the prompt
-suffix = "<|endoftext|>" # Must end with EOS token
+prefix = problem_statement  # Start generation right after the prompt
+suffix = "<|endoftext|>"  # Must end with EOS token
 
 prefix_ids = tokenizer.encode(prefix)
 suffix_ids = tokenizer.encode(suffix)
@@ -30,8 +29,8 @@ suffix_ids = tokenizer.encode(suffix)
 prompt_ids = tokenizer.encode(f"<|endoftext|> {prefix}")
 
 # Adjust token limits for reasoning steps
-min_new_tokens = 20 # Minimum tokens for reasoning + answer
-max_new_tokens = 150 # Maximum tokens for reasoning + answer
+min_new_tokens = 1000  # Minimum tokens for reasoning + answer
+max_new_tokens = 1100  # Maximum tokens for reasoning + answer
 
 vocab_size = hmm_model.vocab_size
 eos_token_id = hmm_model.eos_token_id
@@ -42,34 +41,31 @@ kmp_builder = ctrlg.KMPBuilder(vocab_size)
 eos_builder = ctrlg.EOSBuilder(vocab_size, eos_token_id)
 
 # Define the reasoning steps/phrases
-analyze_phrase = " Problem Analysis:" # Leading space often helps tokenization
-hypothesize_phrase = " Hypothesis:"
+analyze_phrase = " Problem Analysis:"  # Leading space often helps tokenization
+# hypothesize_phrase = " Hypothesis:"
 plan_phrase = " Plan:"
-execute_phrase = " Execution:" # Added execution step
+execute_phrase = " Execution:"  # Added execution step
 final_answer_phrase = " Final Answer:"
 
 # Encode the phrases
 analyze_ids = tokenizer.encode(analyze_phrase)
-hypothesize_ids = tokenizer.encode(hypothesize_phrase)
+# hypothesize_ids = tokenizer.encode(hypothesize_phrase)
 plan_ids = tokenizer.encode(plan_phrase)
 execute_ids = tokenizer.encode(execute_phrase)
 final_answer_ids = tokenizer.encode(final_answer_phrase)
 
 # Build DFAs for each phrase
 dfa_analyze = kmp_builder.build(analyze_ids)
-dfa_hypothesize = kmp_builder.build(hypothesize_ids)
+# dfa_hypothesize = kmp_builder.build(hypothesize_ids)
 dfa_plan = kmp_builder.build(plan_ids)
 dfa_execute = kmp_builder.build(execute_ids)
 dfa_final_answer = kmp_builder.build(final_answer_ids)
 
 # Concatenate DFAs to enforce sequence
-dfa_reasoning_sequence_graph = ctrlg.DFA_concatenate([
-    dfa_analyze,
-    dfa_hypothesize,
-    dfa_plan,
-    dfa_execute,
-    dfa_final_answer
-])
+dfa_reasoning_sequence_graph = ctrlg.DFA_concatenate(
+    [dfa_analyze, dfa_plan, dfa_execute, dfa_final_answer]
+    # [dfa_analyze, dfa_hypothesize, dfa_plan, dfa_execute, dfa_final_answer]
+)
 print("Reasoning Sequence DFA defined.")
 print("State Count:", ctrlg.DFA_size(dfa_reasoning_sequence_graph)[0])
 print("Edge Count:", ctrlg.DFA_size(dfa_reasoning_sequence_graph)[1])
@@ -79,7 +75,7 @@ print("Combining Reasoning DFA with EOS constraint...")
 dfa_eos_graph = eos_builder.build()
 dfa_graph = ctrlg.DFA_prod(
     [dfa_reasoning_sequence_graph, dfa_eos_graph],
-    mode='intersection' # Enforces both constraints
+    mode="intersection",  # Enforces both constraints
 )
 print("Combined DFA defined.")
 print("Final State Count:", ctrlg.DFA_size(dfa_graph)[0])
@@ -138,7 +134,7 @@ generated_ids = ctrlg.rank_generated_ids(
 # print top 5 outputs
 print(f"\n--- Generated Outputs (Top 5) ---")
 print(f"Prompt: {tokenizer.decode(prefix_ids, skip_special_tokens=True)}")
-for idx, generated in enumerate(generated_ids[:5]):
+for idx, generated in enumerate(generated_ids[:1]):
     generated_text = tokenizer.decode(generated, skip_special_tokens=True)
     suffix_text = tokenizer.decode(suffix_ids, skip_special_tokens=True)
     # Only print the generated part clearly marked
