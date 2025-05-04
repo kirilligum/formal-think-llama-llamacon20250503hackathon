@@ -1,6 +1,7 @@
 import os
-device = 'cuda'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0' # set your cuda device
+# Use cuda:0 as the primary device for non-distributed components
+device = 'cuda:0' 
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7' # set your cuda devices
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 import torch
@@ -11,10 +12,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorLis
 # HMM_MODEL_PATH = f'ctrlg/hmm_gpt2-large_common-gen_4096' # alternatively 'ctrlg/hmm_gpt2-large_common-gen_32768' for better quality
 BASE_MODEL_PATH = f'ctrlg/tulu2-7b_writing-prompts'
 HMM_MODEL_PATH = f'ctrlg/hmm_tulu2-7b_writing-prompts_32768'
-base_model = AutoModelForCausalLM.from_pretrained(BASE_MODEL_PATH).to(device)
+# Load base model distributed across available GPUs
+base_model = AutoModelForCausalLM.from_pretrained(BASE_MODEL_PATH, device_map="auto") 
 base_model.eval()
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_PATH)
-hmm_model = ctrlg.HMM.from_pretrained(HMM_MODEL_PATH).to(device)
+# Load HMM model to the primary device
+hmm_model = ctrlg.HMM.from_pretrained(HMM_MODEL_PATH).to(device) 
 problem_statement = "<|user|>\nQuestion: John has 5 apples. He gives 2 apples to Mary. How many apples does John have left?\n<|assistant|>\nResponse:"
 prefix = problem_statement  # Start generation right after the prompt
 suffix = "<|endoftext|>"  # Must end with EOS token
