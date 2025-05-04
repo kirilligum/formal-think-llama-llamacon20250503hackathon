@@ -6,17 +6,17 @@ INPUT_FILE = './workspace/inference_data/distillation_prompts.json'
 
 DATASET = 'Llama-3.2-1B-Instruct' # Updated dataset name
 DATA_PATH = f'./workspace/hmm_data/{DATASET}'
-LVD_SIZE = 100000
-CHUNK_SIZE = 100000
-DEV_SIZE = 20000
-TOTAL_CHUNKS = 100
+LVD_SIZE = 1000
+CHUNK_SIZE = 1000
+DEV_SIZE = 200
+TOTAL_CHUNKS = 4
 SEQUENCE_LEN = 32
 
 import os
 
 
 CUDA_CORES = '0' # Set based on nvidia-smi output
-BATCH_SIZE = 64 # Setting batch size to 64
+BATCH_SIZE = 16 # Setting batch size to 64
 
 
 # create data path
@@ -61,7 +61,7 @@ import os
 from transformers import AutoTokenizer
 
 # specify the HMM size
-HIDDEN_STATES = 4096
+HIDDEN_STATES = 96
 
 # get vocab_size and eos_token_id; might vary for different models #
 __tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_PATH)
@@ -77,7 +77,7 @@ _ = os.system(f'mkdir -p {HMM_MODEL_PATH}')
 
 import os
 
-CUDA_CORES = '0,1,2,3,4,5'
+CUDA_CORES = '0'
 SEQUENCES_FILE = f'{DATA_PATH}/{DATASET}.lvd'
 EMEBEDDINGS_FILE = f'{DATA_PATH}/{DATASET}.lvd.embeddings'
 
@@ -96,7 +96,7 @@ os.system('mkdir -p ./workspace/logs')
 LOG_FILE=f'./workspace/logs/{HMM_MODEL_ID}_log.txt'
 
 CUDA_CORES = '0' # Set based on nvidia-smi output
-BATCH_SIZE = 64 # Setting batch size to 64
+BATCH_SIZE = 8 # Setting batch size to 64
 SAVE_PER_STEP = 10
 DROPOUT = 0.01
 
