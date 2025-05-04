@@ -5,7 +5,7 @@ BASE_MODEL_PATH = 'meta-llama/Llama-4-Scout-17B-16E-Instruct'
 # please change according to the LLM & your use cases.
 INPUT_FILE = './workspace/inference_data/distillation_prompts.json' 
 
-DATASET = 'Llama-3.2-1B-Instruct' # Updated dataset name
+DATASET = 'Llama-4-Scout-17B-16E-Instruct' # Updated dataset name
 DATA_PATH = f'./workspace/hmm_data/{DATASET}'
 LVD_SIZE = 100000
 CHUNK_SIZE = 100000
